@@ -49,16 +49,15 @@ async def get_version():
 
 @api.post("/v1/assistants", response_model=assistants.AssistantRead, tags=['Assistants'])
 async def create_assistant(assistant: assistants.AssistantCreate):
-    r = assistants.create(assistant=assistant)
-    return r
+    return assistants.create(assistant=assistant)
 
 
 @api.get("/v1/assistants/{assistant_id}", response_model=assistants.AssistantRead, tags=['Assistants'])
 async def retrieve_assistant(assistant_id: str):
-    a = assistants.get(id=assistant_id)
-    if not a:
+    if a := assistants.get(id=assistant_id):
+        return a
+    else:
         raise HTTPException(status_code=404, detail="Thread not found")
-    return a
 
 
 @api.post("/v1/assistants/{assistant_id}", response_model=assistants.AssistantRead, tags=['Assistants'])
@@ -80,16 +79,15 @@ async def list_assistants(limit: int = 20, order: str = "desc", after: str = Non
 
 @api.post("/v1/threads", response_model=threads.ThreadRead, tags=['Threads'])
 async def create_thread(thread: threads.ThreadCreate):
-    r = threads.create(thread=thread)
-    return r
+    return threads.create(thread=thread)
 
 
 @api.get("/v1/threads/{thread_id}", response_model=threads.ThreadRead, tags=['Threads'])
 async def retrieve_thread(thread_id: str):
-    t = threads.get(id=thread_id)
-    if not t:
+    if t := threads.get(id=thread_id):
+        return t
+    else:
         raise HTTPException(status_code=404, detail="Thread not found")
-    return t
 
 
 @api.post("/v1/threads/{thread_id}", response_model=threads.ThreadRead, tags=['Threads'])
@@ -111,16 +109,15 @@ async def list_threads(limit: int = 20, order: str = "desc", after: str = None, 
 
 @api.post("/v1/threads/{thread_id}/messages", response_model=messages.MessageRead, tags=['Messages'])
 async def create_message(thread_id: str, message: messages.MessageCreate):
-    r = messages.create(thread_id=thread_id, message=message)
-    return r
+    return messages.create(thread_id=thread_id, message=message)
 
 
 @api.get("/v1/threads/{thread_id}/messages/{message_id}", response_model=messages.MessageRead, tags=['Messages'])
 async def retrieve_message(thread_id: str, message_id: str):
-    t = messages.get(id=message_id)
-    if not t:
+    if t := messages.get(id=message_id):
+        return t
+    else:
         raise HTTPException(status_code=404, detail="Thread not found")
-    return t
 
 
 @api.post("/v1/threads/{thread_id}/messages/{message_id}", response_model=messages.MessageRead, tags=['Messages'])
@@ -142,16 +139,15 @@ async def list_messages(thread_id: str, limit: int = 20, order: str = "desc", af
 
 @api.post("/v1/threads/{thread_id}/runs", response_model=runs.RunRead, tags=['Runs'])
 async def create_run(thread_id: str, run: runs.RunCreate):
-    r = runs.create(thread_id=thread_id, run=run)
-    return r
+    return runs.create(thread_id=thread_id, run=run)
 
 
 @api.get("/v1/threads/{thread_id}/runs/{run_id}", response_model=runs.RunRead, tags=['Runs'])
 async def retrieve_run(thread_id: str, run_id: str):
-    t = runs.get(thread_id=thread_id, run_id=run_id)
-    if not t:
+    if t := runs.get(thread_id=thread_id, run_id=run_id):
+        return t
+    else:
         raise HTTPException(status_code=404, detail="Run not found")
-    return t
 
 
 @api.post("/v1/threads/{thread_id}/runs/{run_id}", response_model=runs.RunRead, tags=['Runs'])

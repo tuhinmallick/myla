@@ -37,8 +37,7 @@ def create(thread: ThreadEdit, session: Session = None) -> ThreadRead:
 @auto_session
 def get(id: str, session: Session = None) -> Union[ThreadRead, None]:
     r = None
-    dbo = session.get(Thread, id)
-    if dbo:
+    if dbo := session.get(Thread, id):
         r = ThreadRead(**dbo.dict())
         r.metadata = dbo.metadata_
 
@@ -49,8 +48,7 @@ def get(id: str, session: Session = None) -> Union[ThreadRead, None]:
 def modify(id: str, thread: ThreadEdit, session: Session = None):
     r = None
 
-    dbo = session.get(Thread, id)
-    if dbo:
+    if dbo := session.get(Thread, id):
         for k, v in thread.dict(exclude_unset=True).items():
             if k == 'metadata':
                 dbo.metadata_ = v
@@ -69,8 +67,7 @@ def modify(id: str, thread: ThreadEdit, session: Session = None):
 
 @auto_session
 def delete(id: str, session: Optional[Session] = None) -> DeletionStatus:
-    dbo = session.get(Thread, id)
-    if dbo:
+    if dbo := session.get(Thread, id):
         # delete all messages that belong to this thread
         session.query(Message).where(Message.thread_id == id).delete()
 
@@ -89,12 +86,11 @@ def list(limit: int = 20, order: str = "desc", after:str = None, before:str = No
         select_stmt = select_stmt.filter(Thread.id < before)
 
     select_stmt = select_stmt.limit(limit)
-    
+
     dbos = session.exec(select_stmt).all()
     rs = []
     for dbo in dbos:
         a = ThreadRead(**dbo.dict())
         a.metadata = dbo.metadata_
         rs.append(a)
-    r = ListModel(data=rs)
-    return r
+    return ListModel(data=rs)

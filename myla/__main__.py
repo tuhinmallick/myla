@@ -22,8 +22,7 @@ def runserver(args):
 
         if args.reload:
             if not args.reload_dirs:
-                args.reload_dirs = []
-                args.reload_dirs.append(MYLA_LIB_DIR)
+                args.reload_dirs = [MYLA_LIB_DIR]
             args.reload_dirs.append(ext_dir)
 
     if args.vectorstore:

@@ -9,16 +9,17 @@ class ECTool(tools.Tool):
         self.device = device
 
     async def execute(self, context: Context) -> None:
-        docs = None
-        for msg in context.messages:
-            if msg.get('type') == 'docs':
-                docs = msg['content']
-                break
-        
-        if not docs:
+        if docs := next(
+            (
+                msg['content']
+                for msg in context.messages
+                if msg.get('type') == 'docs'
+            ),
+            None,
+        ):
+            docs = json.loads(docs)
+        else:
             return
-        
-        docs = json.loads(docs)
         #print(docs)
         #
 

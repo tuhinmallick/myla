@@ -64,8 +64,7 @@ def create(thread_id: str, message: MessageCreate, assistant_id:str = None, run_
 @auto_session
 def get(id: str, session: Session = None) -> Union[MessageRead, None]:
     r = None
-    dbo = session.get(Message, id)
-    if dbo:
+    if dbo := session.get(Message, id):
         r = MessageRead(**dbo.dict())
         r.metadata = dbo.metadata_
 
@@ -76,8 +75,7 @@ def get(id: str, session: Session = None) -> Union[MessageRead, None]:
 def modify(id: str, message: MessageModify, session: Session = None):
     r = None
 
-    dbo = session.get(Message, id)
-    if dbo:
+    if dbo := session.get(Message, id):
         for k, v in message.dict(exclude_unset=True).items():
             if k == 'metadata':
                 dbo.metadata_ = v
@@ -96,8 +94,7 @@ def modify(id: str, message: MessageModify, session: Session = None):
 
 @auto_session
 def delete(id: str, session: Optional[Session] = None) -> DeletionStatus:
-    dbo = session.get(Message, id)
-    if dbo:
+    if dbo := session.get(Message, id):
         session.delete(dbo)
         session.commit()
     return DeletionStatus(id=id, object="thread.message.deleted", deleted=True)
@@ -114,12 +111,15 @@ def list(thread_id: str, limit: int = 20, order: str = "desc", after:str = None,
         select_stmt = select_stmt.filter(Message.id < before)
 
     select_stmt = select_stmt.limit(limit)
-    
+
     dbos = session.exec(select_stmt).all()
     rs = []
     for dbo in dbos:
         a = MessageRead(**dbo.dict())
         a.metadata = dbo.metadata_
         rs.append(a)
-    r = MessageList(data=rs, first_id=rs[0].id if len(rs) > 0 else None, last_id=rs[-1].id if len(rs) > 0 else None)
-    return r
+    return MessageList(
+        data=rs,
+        first_id=rs[0].id if rs else None,
+        last_id=rs[-1].id if rs else None,
+    )

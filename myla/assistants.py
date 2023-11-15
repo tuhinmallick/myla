@@ -38,8 +38,7 @@ class Assistant(DBModel, AssistantBase, table=True):
 def create(assistant: AssistantCreate, session: Session = None) -> AssistantRead:
     db_model = Assistant.from_orm(assistant)
     if not db_model.model or db_model == '':
-        default_model = os.environ.get("DEFAULT_LLM_MODEL_NAME")
-        if default_model:
+        if default_model := os.environ.get("DEFAULT_LLM_MODEL_NAME"):
             db_model.model = default_model
 
     dbo = create_model(object="assistant",
@@ -52,8 +51,7 @@ def create(assistant: AssistantCreate, session: Session = None) -> AssistantRead
 @auto_session
 def get(id: str, session: Session = None) -> Union[AssistantRead, None]:
     r = None
-    dbo = session.get(Assistant, id)
-    if dbo:
+    if dbo := session.get(Assistant, id):
         r = AssistantRead(**dbo.dict())
         r.metadata = dbo.metadata_
 
@@ -64,8 +62,7 @@ def get(id: str, session: Session = None) -> Union[AssistantRead, None]:
 def modify(id: str, assistant: AssistantModify, session: Session = None):
     r = None
 
-    dbo = session.get(Assistant, id)
-    if dbo:
+    if dbo := session.get(Assistant, id):
         for k, v in assistant.dict(exclude_unset=True).items():
             if k == 'metadata':
                 dbo.metadata_ = v
@@ -84,8 +81,7 @@ def modify(id: str, assistant: AssistantModify, session: Session = None):
 
 @auto_session
 def delete(id: str, session: Optional[Session] = None) -> DeletionStatus:
-    dbo = session.get(Assistant, id)
-    if dbo:
+    if dbo := session.get(Assistant, id):
         session.delete(dbo)
         session.commit()
     return DeletionStatus(id=id, object="assistant.deleted", deleted=True)
@@ -101,12 +97,11 @@ def list(limit: int = 20, order: str = "desc", after:str = None, before:str = No
         select_stmt = select_stmt.filter(Assistant.id < before)
 
     select_stmt = select_stmt.limit(limit)
-    
+
     dbos = session.exec(select_stmt).all()
     rs = []
     for dbo in dbos:
         a = AssistantRead(**dbo.dict())
         a.metadata = dbo.metadata_
         rs.append(a)
-    r = ListModel(data=rs)
-    return r
+    return ListModel(data=rs)

@@ -19,7 +19,7 @@ class QASummaryTool(Tool):
     async def execute(self, context: Context) -> None:
         if len(context.messages) == 0:
             return
-        
+
         last_message = context.messages[-1]['content']
 
         docs = None
@@ -27,7 +27,7 @@ class QASummaryTool(Tool):
         for msg in context.messages:
             if msg.get('type') == 'docs':
                 docs = msg
-        
+
         if docs:
             summary = await llms.get().chat(messages=[{
                 "role": "system",
@@ -36,10 +36,11 @@ class QASummaryTool(Tool):
             if summary:
                 docs['content'] = summary
 
-            messages = [] # 删除对话历史, 只保留 system Message 和最后一条用户消息
-            for msg in context.messages:
-                if not (msg['role'] == 'user' or msg['role'] == 'assistant'):
-                    messages.append(msg)
+            messages = [
+                msg
+                for msg in context.messages
+                if msg['role'] not in ['user', 'assistant']
+            ]
             messages.append({"role": "user", "content": last_message})
-            
+
             context.messages = messages

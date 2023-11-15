@@ -15,10 +15,9 @@ from ._web_template import render
 
 @asynccontextmanager
 async def lifespan(api: FastAPI):
-    ext_dir = os.environ.get("EXT_DIR")
-    if ext_dir:
+    if ext_dir := os.environ.get("EXT_DIR"):
         sys.path.append(ext_dir)
-    
+
     _tools.load_tools()
 
     # on startup
@@ -26,8 +25,6 @@ async def lifespan(api: FastAPI):
     await RunScheduler.default().start()
 
     yield
-    # on shutdown
-    pass
 
 # Routes
 routes = [

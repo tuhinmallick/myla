@@ -124,13 +124,7 @@ class Retrieval:
             fetch_k=fetch_k,
             **kwargs
         )
-        d = []
-        for doc in docs:
-            d.append({
-                "doc": doc[0].dict(),
-                "score": float(doc[1])
-            })
-        return d
+        return [{"doc": doc[0].dict(), "score": float(doc[1])} for doc in docs]
 
     def _get_vectorstore_path(self, name):
         root = os.environ.get("VECTORSTORE_DIR")
@@ -138,8 +132,7 @@ class Retrieval:
             logger.warn("VECTORSTORE_DIR required")
             return None
 
-        fname = os.path.join(root, name)
-        return fname
+        return os.path.join(root, name)
 
     def _get_vectorstore(self, name):
         if name not in self._vectorstores:

@@ -50,7 +50,7 @@ def check_run_status(thread, run):
     print(f"Check run status, run_id:{run.id}, status: {run.status}")
     return run
 
-for i in range(10):
+for _ in range(10):
     time.sleep(3)
     r = check_run_status(thread=thread, run= run)
     if r.status == "completed":

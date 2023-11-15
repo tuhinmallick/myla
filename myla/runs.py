@@ -84,15 +84,13 @@ def create(thread_id: str, run: RunCreate, session: Session = None) -> RunRead:
 @auto_session
 def get(thread_id:str, run_id: str, session: Session = None) -> Union[RunRead, None]:
     r = None
-    dbo = session.get(Run, run_id)
-    if dbo:
-        
+    if dbo := session.get(Run, run_id):
         d = dbo.dict()
 
         # Get thread
         # Get assistant
         assitant = assistants.get(id=dbo.assistant_id, session=session)
-        
+
         d.update(assitant.dict())
 
         r = RunRead(**d)
@@ -104,15 +102,14 @@ def get(thread_id:str, run_id: str, session: Session = None) -> Union[RunRead, N
 def modify(id: str, run: RunModify, session: Session = None) -> Union[RunRead, None]:
     r = None
 
-    dbo = session.get(Run, id)
-    if dbo:
+    if dbo := session.get(Run, id):
         for k, v in run.dict(exclude_unset=True).items():
-            
+
             if k == 'metadata':
                 dbo.metadata_ = v
             else:
                 setattr(dbo, k, v)
-            
+
         session.add(dbo)
         session.commit()
         session.refresh(dbo)
@@ -120,7 +117,7 @@ def modify(id: str, run: RunModify, session: Session = None) -> Union[RunRead, N
         # Get thread
         # Get assistant
         #asistant = assistants.get(id=dbo.assistant_id, session=session)
-        
+
         r = RunRead(**dbo.dict())
         r.metadata = dbo.metadata_
 
@@ -129,8 +126,7 @@ def modify(id: str, run: RunModify, session: Session = None) -> Union[RunRead, N
 
 @auto_session
 def delete(id: str, session: Optional[Session] = None) -> DeletionStatus:
-    dbo = session.get(Run, id)
-    if dbo:
+    if dbo := session.get(Run, id):
         session.delete(dbo)
         session.commit()
     return DeletionStatus(id=id, object="thread.run.deleted", deleted=True)
@@ -146,11 +142,11 @@ def list(thread_id:str, limit: int = 20, order: str = "desc", after:str = None, 
         select_stmt = select_stmt.filter(Run.id < before)
 
     select_stmt = select_stmt.limit(limit)
-    
+
     dbos = session.exec(select_stmt).all()
     rs = []
     for dbo in dbos:
-        
+
         # Get assistant
         #asistant = assistants.get(id=dbo.assistant_id, session=session)
         #if assitant:
@@ -159,8 +155,7 @@ def list(thread_id:str, limit: int = 20, order: str = "desc", after:str = None, 
         a = RunRead(**dbo.dict())
         a.metadata = dbo.metadata_
         rs.append(a)
-    r = ListModel(data=rs)
-    return r
+    return ListModel(data=rs)
 
 def cancel(thread_id: str, run_id: str, session: Session = None) -> Union[RunRead, None]:
     return
@@ -180,15 +175,14 @@ def get_step(thread_id: str, run_id: str, step_id: str, session: Session = None)
 
 @auto_session
 def update(id: str, session: Session = None, **kwargs):
-    dbo = session.get(Run, id)
-    if dbo:
+    if dbo := session.get(Run, id):
         for k, v in kwargs.items():
-            
+
             if k == 'metadata':
                 dbo.metadata_ = v
             else:
                 setattr(dbo, k, v)
-            
+
         session.add(dbo)
         session.commit()
         session.refresh(dbo)
