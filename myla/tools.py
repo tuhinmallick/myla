@@ -49,12 +49,11 @@ class HTTPTool(Tool):
         async with aiohttp.ClientSession() as session:
             async with session.post(url=self.url, json=context.messages) as resp:
                 try:
-                    if resp.status == 200:
-                        result = await resp.json()
-                        context.messages = result['messages']
-                        context.llm_args.update(result['llm_args'])
-                        context.message_metadata.update(result['message_metadata'])
-                    else:
+                    if resp.status != 200:
                         raise BaseException(f"status: {resp.status}")
+                    result = await resp.json()
+                    context.messages = result['messages']
+                    context.llm_args.update(result['llm_args'])
+                    context.message_metadata.update(result['message_metadata'])
                 except Exception as e:
                     logger.warn(f"HTTP Tool execute failed: url={self.url} status={e}")

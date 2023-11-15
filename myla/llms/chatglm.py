@@ -45,8 +45,9 @@ async def chat(messages: List[Dict], model=None, stream=False, **kwargs):
         return ''.join(genreated)
     
 async def generate(instructions: str, model=None, stream=False, **kwargs):
-    r = await chat(messages=[{
-        "role": "system",
-        "content": instructions
-    }], model=model, stream=stream, **kwargs)
-    return r
+    return await chat(
+        messages=[{"role": "system", "content": instructions}],
+        model=model,
+        stream=stream,
+        **kwargs
+    )

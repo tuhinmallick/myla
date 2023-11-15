@@ -152,11 +152,7 @@ def combine_system_messages(messages):
             system_message.append(msg["content"])
         else:
             normal_messages.append(msg)
-    r_messages = [
-        {
-            "role": "system",
-            "content": '\n'.join(system_message)
-        }
+    return [
+        {"role": "system", "content": '\n'.join(system_message)},
+        *normal_messages,
     ]
-    r_messages.extend(normal_messages)
-    return r_messages

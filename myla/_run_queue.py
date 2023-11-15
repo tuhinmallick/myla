@@ -45,10 +45,10 @@ async def clear_iters():
     if _last_clear_at + expires > now:
         return
     async with _lock:
-        expired = []
-        for run_id, iter in _run_iters.items():
-            if iter.created_at + expires < now:
-                expired.append(run_id)
-
+        expired = [
+            run_id
+            for run_id, iter in _run_iters.items()
+            if iter.created_at + expires < now
+        ]
         for run_id in expired:
             _run_iters.pop(run_id)
